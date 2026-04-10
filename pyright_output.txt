@@ -1,0 +1,5 @@
+c:\Users\Administrador\Documents\AntiGravity\Sociax\sociax_analytics_v2\ai_engine.py
+  c:\Users\Administrador\Documents\AntiGravity\Sociax\sociax_analytics_v2\ai_engine.py:15:15 - error: "configure" is not exported from module "google.generativeai" (reportPrivateImportUsage)
+  c:\Users\Administrador\Documents\AntiGravity\Sociax\sociax_analytics_v2\ai_engine.py:17:28 - error: "GenerativeModel" is not exported from module "google.generativeai" (reportPrivateImportUsage)
+  c:\Users\Administrador\Documents\AntiGravity\Sociax\sociax_analytics_v2\ai_engine.py:63:14 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+3 errors, 0 warnings, 0 informations

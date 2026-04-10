@@ -1,0 +1,427 @@
+/* premium-sociax-v2.css */
+@import url('https://fonts.googleapis.com/css2?family=Michroma&family=Titillium+Web:wght@300;400;600;700&display=swap');
+
+:root {
+    --sociax-green: #00B74F;
+    --sociax-green-glow: rgba(0, 183, 79, 0.3);
+    --bg-dark: #05080A;
+    --card-bg: rgba(22, 30, 38, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-main: #F8FAFC;
+    --text-dim: #94A3B8;
+}
+
+/* Base reset and background */
+.stApp {
+    background: radial-gradient(circle at top right, #0F172A, #05080A 60%);
+    color: var(--text-main);
+    font-family: 'Titillium Web', sans-serif;
+}
+
+/* Sidebar Toggle & Header Correction */
+header[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+button[data-testid="collapsedControl"] {
+    color: var(--sociax-green) !important;
+    background: rgba(22, 30, 38, 0.6) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 10px !important;
+    margin: 10px !important;
+    top: 10px !important;
+    left: 10px !important;
+    transition: all 0.3s ease !important;
+}
+
+button[data-testid="collapsedControl"]:hover {
+    background: var(--sociax-green) !important;
+    color: black !important;
+}
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+div[data-testid="stStatusWidget"] {
+    visibility: hidden;
+}
+
+/* Typography Overhaul */
+h1,
+h2,
+h3,
+.sociax-header {
+    font-family: 'Michroma', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* Glassmorphic Metrics */
+div[data-testid="stMetric"] {
+    background: var(--card-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: transform 0.3s ease, border-color 0.3s ease !important;
+}
+
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-5px);
+    border-color: var(--sociax-green-glow) !important;
+}
+
+[data-testid="stMetricValue"] {
+    background: linear-gradient(135deg, white 0%, var(--sociax-green) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+}
+
+/* Sidebar Styling - Premium Dark */
+section[data-testid="stSidebar"] {
+    background-color: #080C0F !important;
+    border-right: 1px solid var(--glass-border) !important;
+}
+
+section[data-testid="stSidebar"] label p {
+    color: var(--text-main) !important;
+    font-family: 'Michroma', sans-serif !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+section[data-testid="stSidebar"] .stMarkdown p {
+    color: var(--text-dim) !important;
+}
+
+section[data-testid="stSidebar"] .stAlert {
+    background-color: rgba(0, 183, 79, 0.05) !important;
+    border: 1px solid rgba(0, 183, 79, 0.15) !important;
+    color: var(--sociax-green) !important;
+}
+
+/* Premium Buttons - The Creative Performance Look */
+.stButton>button {
+    background: linear-gradient(135deg, var(--sociax-green) 0%, #009940 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    color: #000 !important;
+    font-family: 'Michroma', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    padding: 0.75rem 2rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 15px rgba(0, 183, 79, 0.2) !important;
+}
+
+.stButton>button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 183, 79, 0.4) !important;
+    background: white !important;
+    color: black !important;
+}
+
+/* AI Results Card - Premium Glow */
+.premium-card {
+    background: rgba(0, 183, 79, 0.03);
+    border: 1px solid var(--sociax-green);
+    border-radius: 20px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(0, 183, 79, 0.05);
+}
+
+.premium-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--sociax-green);
+    box-shadow: 0 0 15px var(--sociax-green);
+}
+
+.premium-card h1,
+.premium-card h2,
+.premium-card h3 {
+    color: var(--sociax-green) !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    font-family: 'Michroma', sans-serif !important;
+}
+
+.premium-card p,
+.premium-card li {
+    line-height: 1.6 !important;
+    color: #E2E8F0 !important;
+    font-size: 0.95rem !important;
+}
+
+.premium-card strong {
+    color: var(--sociax-green) !important;
+}
+
+.premium-card code {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #00FF6F !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: monospace !important;
+}
+
+/* Custom Glow Effects */
+.sociax-glow-text {
+    color: white !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.sociax-subheader-bar {
+    border-left: 3px solid var(--sociax-green);
+    padding-left: 15px;
+    margin: 20px 0;
+    color: white !important;
+    font-weight: 700;
+}
+
+/* Dataframe & Table cleanup */
+div[data-testid="stDataFrame"] {
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* Input & Select Overhaul */
+.stTextInput input,
+.stSelectbox [data-baseweb="select"],
+.stDateInput input {
+    background-color: rgba(22, 30, 38, 0.4) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 10px !important;
+    color: white !important;
+    font-family: 'Titillium Web', sans-serif !important;
+    transition: all 0.3s ease !important;
+}
+
+.stTextInput input:focus,
+.stSelectbox [data-baseweb="select"]:focus-within {
+    border-color: var(--sociax-green) !important;
+    box-shadow: 0 0 10px var(--sociax-green-glow) !important;
+}
+
+label {
+    color: var(--text-dim) !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Chat Micro-animations */
+/* Absolute Reset Icon - Dark Gray Correction */
+div.auth-reset-container .stButton>button {
+    position: relative !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background-color: #1E293B !important;
+    background-image: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--sociax-green) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+    margin-top: 10px !important;
+    transition: all 0.3s ease !important;
+}
+
+div.auth-reset-container .stButton>button:hover {
+    background-color: var(--sociax-green) !important;
+    color: #000 !important;
+    transform: rotate(180deg) !important;
+}
+
+/* Sidebar Radio Navigation Styling */
+div[data-testid="stSidebarNav"] {
+    display: none;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] {
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label[data-baseweb="radio"] {
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-radius: 12px !important;
+    padding: 12px 18px !important;
+    margin-bottom: 10px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label[data-baseweb="radio"] [data-testid="stWidgetLabel"] {
+    display: block !important;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label[data-baseweb="radio"] div:first-child div:first-child {
+    opacity: 0 !important;
+    width: 0 !important;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label[data-baseweb="radio"]:hover {
+    background: rgba(0, 183, 79, 0.08) !important;
+    border-color: rgba(0, 183, 79, 0.2) !important;
+    transform: translateX(4px);
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label div[data-testid="stMarkdownContainer"] p {
+    color: white !important;
+    font-family: 'Michroma', sans-serif !important;
+    font-size: 0.8rem !important;
+    margin: 0 !important;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(90deg, rgba(0, 183, 79, 0.15) 0%, rgba(0, 183, 79, 0.02) 100%) !important;
+    border-color: var(--sociax-green) !important;
+    box-shadow: inset 0 0 15px rgba(0, 183, 79, 0.05) !important;
+}
+
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p {
+    color: var(--sociax-green) !important;
+    font-weight: 700 !important;
+}
+
+/* Tab Styling */
+div[data-testid="stTab"] {
+    background-color: transparent !important;
+    color: var(--text-dim) !important;
+    font-family: 'Michroma', sans-serif !important;
+    font-size: 0.8rem !important;
+}
+
+button[data-baseweb="tab"] {
+    background-color: transparent !important;
+}
+
+div[data-testid="stTab"][aria-selected="true"] {
+    color: var(--sociax-green) !important;
+}
+
+/* Intelligence Layer: Command Center & Terminal */
+.command-center-container {
+    background: rgba(8, 12, 15, 0.8) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 20px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+.terminal-viewport {
+    background: #020405 !important;
+    border: 1px solid rgba(0, 183, 79, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 2rem !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: inset 0 0 30px rgba(0, 183, 79, 0.1) !important;
+}
+
+.terminal-viewport::before {
+    content: " " !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(0deg,
+            rgba(0, 183, 79, 0) 0%,
+            rgba(0, 183, 79, 0.02) 50%,
+            rgba(0, 183, 79, 0) 100%) !important;
+    background-size: 100% 4px !important;
+    pointer-events: none !important;
+    animation: scanline 10s linear infinite !important;
+    z-index: 10 !important;
+}
+
+.terminal-header {
+    border-bottom: 1px solid rgba(0, 183, 79, 0.2) !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.terminal-status {
+    color: var(--sociax-green) !important;
+    font-family: 'Michroma', sans-serif !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+}
+
+.terminal-status::before {
+    content: "●" !important;
+    margin-right: 8px !important;
+    animation: blink 1s steps(2) infinite !important;
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Pulsing AI Button */
+.stButton>button:active,
+.stButton>button:focus {
+    animation: button-pulse 0.5s ease-out !important;
+}
+
+@keyframes button-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 183, 79, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(0, 183, 79, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 183, 79, 0);
+    }
+}

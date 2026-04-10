@@ -1,0 +1,96 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Michroma&family=Titillium+Web:wght@300;400;600;700&display=swap');
+
+:root {
+    --sociax-green: #00B74F;
+    --bg-dark: #0A0F14;
+    --card-bg: #161E26;
+    --text-main: #E2E8F0;
+    --text-dim: #94A3B8;
+}
+
+/* Global Styles */
+.stApp {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Titillium Web', sans-serif;
+}
+
+h1, h2, h3, .sociax-header {
+    font-family: 'Michroma', sans-serif;
+    color: white;
+    letter-spacing: 0.05em;
+}
+
+/* Sidebar Styling */
+section[data-testid="stSidebar"] {
+    background-color: var(--card-bg);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+section[data-testid="stSidebar"] .stSubheader {
+    color: var(--sociax-green);
+    font-family: 'Michroma', sans-serif;
+}
+
+/* Metric Cards */
+[data-testid="stMetricValue"] {
+    color: var(--sociax-green) !important;
+    font-family: 'Michroma', sans-serif;
+}
+
+div[data-testid="stMetric"] {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s;
+}
+
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-5px);
+    border-color: var(--sociax-green);
+}
+
+/* Buttons */
+.stButton > button {
+    background-color: var(--sociax-green) !important;
+    color: black !important;
+    font-family: 'Michroma', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    border: none;
+    padding: 0.5rem 2rem;
+    width: 100%;
+    font-weight: bold;
+}
+
+.stButton > button:hover {
+    background-color: white !important;
+    color: black !important;
+}
+
+/* Dataframe Styling */
+div[data-testid="stDataFrame"] {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+/* Chat Input Styling */
+.stChatInputContainer {
+    border-color: var(--sociax-green) !important;
+}
+
+/* Custom Classes */
+.sociax-glow {
+    text-shadow: 0 0 10px rgba(0, 183, 79, 0.5);
+}
+
+.premium-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    border-left: 4px solid var(--sociax-green);
+    margin-bottom: 2rem;
+}

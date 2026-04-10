@@ -1,0 +1,17 @@
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
+google-generativeai
+streamlit
+pandas
+plotly
+python-dotenv
+tabulate
+trafilatura
+beautifulsoup4
+requests
+lxml
+Pillow
+openpyxl
+selenium
+webdriver-manager
