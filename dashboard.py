@@ -406,7 +406,7 @@ if gsc:
                 
                 if st.button("🚀 GERAR CONTEÚDO OTIMIZADO", use_container_width=True):
                     if target_kw:
-                        with st.spinner("Motor Sociax gerando conteúdo e validando SEO..."):
+                        with st.spinner("🔍 Coletando tendências em tempo real do Google Trends e gerando conteúdo..."):
                             client_data = clients_db[selected_client_key]
                             # Chama a nova função de AI
                             generated_content = ai.generate_blog_content(client_data, target_kw, content_style, keyword_average, additional_notes, content_intent, kw_type, content_format)

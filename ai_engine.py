@@ -14,6 +14,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from pytrends.request import TrendReq
 import time
 
 load_dotenv()
@@ -423,12 +424,48 @@ class AIEngineGemini:
         prompt = f"Você é um estrategista de conteúdo da Sociax. Analise a hierarquia e relevância dos seguintes headers para a palavra-chave '{kw}': {json.dumps(data)} em PT-BR"
         return self._safe_generate(prompt)
 
+    def _fetch_google_trends(self, keyword):
+        """Busca dados em tempo real do Google Trends para a palavra-chave alvo."""
+        try:
+            pytrends = TrendReq(hl='pt-BR', tz=-180, timeout=(10, 25))
+            pytrends.build_payload([keyword], cat=0, timeframe='today 3-m', geo='BR')
+            
+            related = pytrends.related_queries()
+            kw_data = related.get(keyword, {})
+            
+            top_queries = []
+            rising_queries = []
+            
+            if kw_data.get('top') is not None and not kw_data['top'].empty:
+                top_queries = kw_data['top']['query'].head(10).tolist()
+            if kw_data.get('rising') is not None and not kw_data['rising'].empty:
+                rising_queries = kw_data['rising']['query'].head(10).tolist()
+
+            return {
+                "top_queries": top_queries,
+                "rising_queries": rising_queries
+            }
+        except Exception as e:
+            print(f"⚠️ Google Trends indisponível para '{keyword}': {e}")
+            return None
+
     def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes="", intent="Informativo", kw_type="Short tail", content_format="Blog post content"):
         """
-        Gera um conteúdo otimizado para SEO seguindo a técnica de Storytelling Orientado a Dados,
-        respeitando regras restritas de formatação e tom de voz.
+        Gera um conteúdo otimizado para SEO com dados reais do Google Trends.
         """
         notes_section = f"\n        OBSERVAÇÕES ADICIONAIS DO USUÁRIO:\n        - {additional_notes}\n" if additional_notes.strip() else ""
+        
+        # Fetch live Google Trends data
+        trends_data = self._fetch_google_trends(keyword)
+        if trends_data:
+            trends_section = f"""
+        DADOS EM TEMPO REAL DO GOOGLE TRENDS (Brasil, Últimos 3 meses):
+        - Buscas Relacionadas mais Populares (Top): {', '.join(trends_data['top_queries']) or 'N/D'}
+        - Buscas em Ascensão / Breakout Topics: {', '.join(trends_data['rising_queries']) or 'N/D'}
+        INSTRUCAO: Baseie a "Visão de Busca" e os subtemas do artigo nestes dados reais acima. Não invente ou simule tendências.
+        """
+        else:
+            trends_section = "\n        AVISO: Google Trends indisponível no momento. Use seu melhor julgamento sobre as tendências atuais para esta palavra-chave.\n"
         
         prompt = f"""
         Você é um Especialista Sênior em Conteúdo e SEO. Seu objetivo é criar um material de altíssima qualidade 
@@ -441,25 +478,26 @@ class AIEngineGemini:
         - Intenção de Busca do Conteúdo: {intent}
         - Tipo de Palavra-Chave: {kw_type}
         - Formato Exigido: {content_format}
+        {trends_section}
         {notes_section}
         DIRETRIZES TÉCNICAS E REGRAS INEGOCIÁVEIS:
-        1. Pesquisa Simulada: Dedique a primeira seção (Visão de Busca) para explicar rapidamente a intenção de busca para esta palavra-chave.
+        1. Visão de Busca: Dedique a primeira seção para explicar a intenção de busca e como os dados do Google Trends acima confirmam essa tendência.
         2. Estrutura Obrigatória: Crie um Outline claro (H1 título principal, H2 subtítulos, H3 detalhamentos).
-        3. Storytelling Orientado a Dados: O artigo DEVE conter dados concretos (simulados de 2025/2026, cite fontes factíveis) e exemplos práticos reais. PROIBIDO conteúdo genérico.
-        4. Mobile-first: ABSOLUTAMENTE NENHUM parágrafo pode ter mais do que 3 frases. Quebre blocos de texto longos.
+        3. Storytelling Orientado a Dados: O conteúdo DEVE incorporar os temas em ascensão do Google Trends com dados concretos (cite fontes factíveis de 2025/2026). PROIBIDO conteúdo genérico.
+        4. Mobile-first: ABSOLUTAMENTE NENHUM parágrafo pode ter mais do que 3 frases.
         5. Analogias Simples: Se houver termos técnicos complexos, explique-os usando analogias do dia a dia.
-        6. Proibição de Clichês: NUNCA use expressões como "No mundo dinâmico de hoje", "Na era digital", "Em um cenário em constante evolução", "Desde os primórdios".
-        7. Conclusão e CTA: Finalize com uma forte Chamada para Ação (CTA) embutindo o link do cliente e o nome da marca de forma natural, focado em conversão ou autoridade.
-        8. Simulação de Ferramentas: No final do artigo, adicione um sumário técnico simulando:
-           - Lacunas de concorrentes batidas (analyze_competitors_top_results).
+        6. Proibição de Clichês: NUNCA use expressões como "No mundo dinâmico de hoje", "Na era digital", "Em um cenário em constante evolução".
+        7. Conclusão e CTA: Finalize com uma forte Chamada para Ação (CTA) embutindo o link do cliente de forma natural.
+        8. Sumário Técnico: No final, adicione um sumário simulando:
+           - Lacunas de concorrentes batidas.
            - Densidade da Palavra-Chave (seo_check_score).
-        9. Média de Palavra-Chave: A palavra-chave principal DEVE aparecer em média cerca de {keyword_average} vezes ao longo de todo o texto.
+        9. Média de Palavra-Chave: A palavra-chave principal DEVE aparecer em média cerca de {keyword_average} vezes ao longo do texto.
 
         DIRETRIZ DE ESTILO DE ESCRITA ESPERADO:
         O tom do texto deve seguir exatamente este estilo: **{style}**
         - Se Educativo: Foco em tutorial passo-a-passo e guias práticos "Como Fazer".
-        - Se Provocativo: Quebre paradigmas, questione o status quo ou o padrão tradicional do mercado em tom de opinião contundente.
-        - Se Data-Driven: Seja extremamente analítico, focado puramente em métricas financeiras/performance, com tom corporativo (Relatório).
+        - Se Provocativo: Quebre paradigmas, questione o status quo do mercado em tom de opinião contundente.
+        - Se Data-Driven: Seja extremamente analítico, focado em métricas de performance, com tom corporativo.
 
         REQUISITO DE SAÍDA:
         Responda integralmente em Markdown (PT-BR). Comece direto com a resposta, sem saudações.
@@ -468,6 +506,6 @@ class AIEngineGemini:
         **Meta Description:** (descrição chamativa com CTA, até 160 chars)
         **Slug:** (slug-curto-e-otimizado)
         
-        Logo após essa seção, inicie o artigo estruturado.
+        Logo após essa seção, inicie o conteúdo estruturado.
         """
         return self._safe_generate(prompt)
