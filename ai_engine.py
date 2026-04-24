@@ -423,16 +423,16 @@ class AIEngineGemini:
         prompt = f"Você é um estrategista de conteúdo da Sociax. Analise a hierarquia e relevância dos seguintes headers para a palavra-chave '{kw}': {json.dumps(data)} em PT-BR"
         return self._safe_generate(prompt)
 
-    def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes="", intent="Informativo", kw_type="Short tail"):
+    def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes="", intent="Informativo", kw_type="Short tail", content_format="Blog post content"):
         """
-        Gera um artigo de blog otimizado para SEO seguindo a técnica de Storytelling Orientado a Dados,
+        Gera um conteúdo otimizado para SEO seguindo a técnica de Storytelling Orientado a Dados,
         respeitando regras restritas de formatação e tom de voz.
         """
         notes_section = f"\n        OBSERVAÇÕES ADICIONAIS DO USUÁRIO:\n        - {additional_notes}\n" if additional_notes.strip() else ""
         
         prompt = f"""
-        Você é um Especialista Sênior em Conteúdo e SEO. Seu objetivo é criar um artigo de blog de altíssima qualidade 
-        que posicione o cliente como autoridade no setor. A palavra-chave foco é: "{keyword}".
+        Você é um Especialista Sênior em Conteúdo e SEO. Seu objetivo é criar um material de altíssima qualidade 
+        no formato "{content_format}" que posicione o cliente como autoridade no setor. A palavra-chave foco é: "{keyword}".
 
         DADOS DO CLIENTE E DO CONTEÚDO:
         - Nome: {client_data['name']}
@@ -440,6 +440,7 @@ class AIEngineGemini:
         - Website: {client_data['url']}
         - Intenção de Busca do Conteúdo: {intent}
         - Tipo de Palavra-Chave: {kw_type}
+        - Formato Exigido: {content_format}
         {notes_section}
         DIRETRIZES TÉCNICAS E REGRAS INEGOCIÁVEIS:
         1. Pesquisa Simulada: Dedique a primeira seção (Visão de Busca) para explicar rapidamente a intenção de busca para esta palavra-chave.
