@@ -379,7 +379,9 @@ if gsc:
                 "Sociax": {"name": "Sociax", "url": "https://sociax.com.br/", "desc": "Agência de marketing de performance"},
                 "Terê": {"name": "Terê", "url": "https://usetere.com.br/", "desc": "E-commerce de produtos de beleza"},
                 "Unidombosco": {"name": "Unidombosco", "url": "https://unidombosco.edu.br/", "desc": "Faculdade com diversos cursos de graduação e pós-graduação"},
-                "EPD": {"name": "EPD", "url": "https://epd.edu.br/", "desc": "Faculdade de direito especializada em mestrado e pós-graduação"}
+                "EPD": {"name": "EPD", "url": "https://epd.edu.br/", "desc": "Faculdade de direito especializada em mestrado e pós-graduação"},
+                "Agibank": {"name": "Agibank", "url": "https://agibank.com.br/", "desc": "Banco digital, soluções financeiras e crédito"},
+                "Blog Agibank": {"name": "Blog Agibank", "url": "https://blog.agibank.com.br/", "desc": "Blog oficial de educação financeira e dicas sobre crédito"}
             }
 
             with st.container(border=True):
