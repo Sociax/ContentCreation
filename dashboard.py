@@ -54,25 +54,42 @@ gsc, ai = init_engines_v2()
 
 if gsc:
     try:
+        # --- Sidebar Navigation State Management ---
+        if 'current_view' not in st.session_state:
+            st.session_state.current_view = "📊 GSC ANALYTICS"
+
+        def set_view(group_key):
+            if st.session_state[group_key] is not None:
+                st.session_state.current_view = st.session_state[group_key]
+
         # --- Sidebar Navigation ---
+        gsc_opts = ["📊 GSC ANALYTICS"]
+        content_opts = ["✍️ CRIADOR DE CONTEÚDOS", "📝 OTIMIZADOR DE CONTEÚDO"]
+        tech_opts = ["⚡ CWV", "⚔️ COMPARADOR DE URLS", "🔗 LINKS INTERNOS", "📊 SCHEMA", "📑 HEADERS", "🌐 HREFLANG", "🖼️ ALT IMAGE"]
+
         with st.sidebar:
-            st.markdown("<div class='sociax-subheader-bar'>NAVEGAÇÃO</div>", unsafe_allow_html=True)
-            view = st.radio(
-                "Selecionar Visualização",
-                [
-                    "📊 GSC ANALYTICS", 
-                    "📝 OTIMIZADOR DE CONTEÚDO", 
-                    "⚡ CWV",
-                    "⚔️ COMPARADOR DE URLS",
-                    "🔗 LINKS INTERNOS",
-                    "📊 SCHEMA",
-                    "📑 HEADERS",
-                    "🌐 HREFLANG",
-                    "🖼️ ALT IMAGE",
-                    "✍️ CRIADOR DE CONTEÚDOS"
-                ],
-                key="navigation_radio"
+            st.markdown("<div class='sociax-subheader-bar'>DATA & ANALYTICS</div>", unsafe_allow_html=True)
+            st.radio(
+                "GSC", gsc_opts, 
+                index=gsc_opts.index(st.session_state.current_view) if st.session_state.current_view in gsc_opts else None, 
+                key="nav_gsc", on_change=set_view, args=("nav_gsc",), label_visibility="collapsed"
             )
+            
+            st.markdown("<div class='sociax-subheader-bar'>CONTENT CATEGORY</div>", unsafe_allow_html=True)
+            st.radio(
+                "Content", content_opts, 
+                index=content_opts.index(st.session_state.current_view) if st.session_state.current_view in content_opts else None, 
+                key="nav_content", on_change=set_view, args=("nav_content",), label_visibility="collapsed"
+            )
+
+            st.markdown("<div class='sociax-subheader-bar'>TECH SEO CATEGORY</div>", unsafe_allow_html=True)
+            st.radio(
+                "Tech", tech_opts, 
+                index=tech_opts.index(st.session_state.current_view) if st.session_state.current_view in tech_opts else None, 
+                key="nav_tech", on_change=set_view, args=("nav_tech",), label_visibility="collapsed"
+            )
+
+        view = st.session_state.current_view
 
         # --- Sidebar Controls ---
         with st.sidebar:
