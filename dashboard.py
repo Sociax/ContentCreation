@@ -389,8 +389,13 @@ if gsc:
                 with col_cg1:
                     selected_client_key = st.selectbox("Selecione o Cliente", list(clients_db.keys()))
                     target_kw = st.text_input("Palavra-Chave Principal", placeholder="ex: Mestrado em Direito Administrativo")
+                    kw_type = st.selectbox("Tipo de Palavra-Chave", ["Short tail", "Mid tail", "Long tail"])
                     keyword_average = st.number_input("Média de Palavras-Chave Desejada", min_value=1, value=5, help="Quantas vezes a palavra-chave deve aparecer em média no texto")
                 with col_cg2:
+                    content_intent = st.selectbox(
+                        "Intenção de Busca",
+                        ["Informativo", "Navegacional", "Comercial", "Transacional"]
+                    )
                     content_style = st.radio(
                         "Estilo de Escrita",
                         options=["Educativo (Tutorial)", "Provocativo (Opinião)", "Data-Driven (Relatório)"]
@@ -403,7 +408,7 @@ if gsc:
                         with st.spinner("Motor Sociax gerando conteúdo e validando SEO..."):
                             client_data = clients_db[selected_client_key]
                             # Chama a nova função de AI
-                            generated_content = ai.generate_blog_content(client_data, target_kw, content_style, keyword_average, additional_notes)
+                            generated_content = ai.generate_blog_content(client_data, target_kw, content_style, keyword_average, additional_notes, content_intent, kw_type)
                             st.session_state['cg_report'] = generated_content
                     else:
                         st.warning("Preencha a Palavra-Chave Principal para continuar.")

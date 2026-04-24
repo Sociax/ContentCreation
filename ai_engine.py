@@ -423,7 +423,7 @@ class AIEngineGemini:
         prompt = f"Você é um estrategista de conteúdo da Sociax. Analise a hierarquia e relevância dos seguintes headers para a palavra-chave '{kw}': {json.dumps(data)} em PT-BR"
         return self._safe_generate(prompt)
 
-    def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes=""):
+    def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes="", intent="Informativo", kw_type="Short tail"):
         """
         Gera um artigo de blog otimizado para SEO seguindo a técnica de Storytelling Orientado a Dados,
         respeitando regras restritas de formatação e tom de voz.
@@ -434,10 +434,12 @@ class AIEngineGemini:
         Você é um Especialista Sênior em Conteúdo e SEO. Seu objetivo é criar um artigo de blog de altíssima qualidade 
         que posicione o cliente como autoridade no setor. A palavra-chave foco é: "{keyword}".
 
-        DADOS DO CLIENTE:
+        DADOS DO CLIENTE E DO CONTEÚDO:
         - Nome: {client_data['name']}
         - Descrição: {client_data['desc']}
         - Website: {client_data['url']}
+        - Intenção de Busca do Conteúdo: {intent}
+        - Tipo de Palavra-Chave: {kw_type}
         {notes_section}
         DIRETRIZES TÉCNICAS E REGRAS INEGOCIÁVEIS:
         1. Pesquisa Simulada: Dedique a primeira seção (Visão de Busca) para explicar rapidamente a intenção de busca para esta palavra-chave.
