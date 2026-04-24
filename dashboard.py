@@ -91,14 +91,16 @@ if gsc:
                     "Selecionar Propriedade", 
                     sites, 
                     index=sites.index(st.session_state['selected_site']) if st.session_state['selected_site'] in sites else 0,
-                    key="property_selector"
+                    key="property_selector",
+                    help="Escolha o ativo digital (site) para carregar os sinais de busca."
                 )
                 st.session_state['selected_site'] = selected
 
-                start = st.date_input("Início da Análise", date.today() - timedelta(days=30))
-                end = st.date_input("Fim da Análise", date.today())
+                start = st.date_input("Início da Análise", date.today() - timedelta(days=30), help="Data inicial para auditoria dos dados de busca.")
+                end = st.date_input("Fim da Análise", date.today(), help="Data final para auditoria dos dados de busca.")
                 
-                if st.button("CARREGAR DADOS DE MERCADO", use_container_width=True):
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("🚀 CARREGAR DADOS DE MERCADO", use_container_width=True, help="Conectar ao motor GSC e processar sinais."):
                     with st.spinner("Decodificando sinais do GSC..."):
                         df = gsc.fetch_analytics(selected, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
                         st.session_state['v2_data'] = df

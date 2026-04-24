@@ -191,6 +191,7 @@ class AIEngineGemini:
     def scrape_url_seo(self, url):
         """Scrapa uma URL usando Selenium com fallback de User-Agent em 3 estágios."""
         def get_driver(ua):
+            from shutil import which
             options = Options()
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
@@ -198,7 +199,18 @@ class AIEngineGemini:
             options.add_argument("--disable-gpu")
             options.add_argument("--window-size=1920,1080")
             options.add_argument(f'user-agent={ua}')
-            service = ChromeService(ChromeDriverManager().install())
+            
+            # Verificação para Streamlit Cloud
+            binary_loc = which("chromium") or which("chromium-browser") or which("google-chrome")
+            if binary_loc:
+                options.binary_location = binary_loc
+                
+            driver_loc = which("chromedriver") or which("chromium-driver")
+            if driver_loc:
+                service = ChromeService(executable_path=driver_loc)
+            else:
+                service = ChromeService(ChromeDriverManager().install())
+                
             return webdriver.Chrome(service=service, options=options)
 
         user_agents = [
@@ -448,5 +460,11 @@ class AIEngineGemini:
 
         REQUISITO DE SAÍDA:
         Responda integralmente em Markdown (PT-BR). Comece direto com a resposta, sem saudações.
+        Obrigatório: No início da resposta, inclua uma seção de Metadados de SEO formatada assim:
+        **Meta Title:** (título otimizado, até 60 chars)
+        **Meta Description:** (descrição chamativa com CTA, até 160 chars)
+        **Slug:** (slug-curto-e-otimizado)
+        
+        Logo após essa seção, inicie o artigo estruturado.
         """
         return self._safe_generate(prompt)
