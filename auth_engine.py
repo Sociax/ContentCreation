@@ -22,7 +22,20 @@ class AuthEngineGSC:
 
     def connect(self):
         """Authenticates and builds the Search Console service."""
-        if os.path.exists(self.token_file):
+        try:
+            import streamlit as st
+            from google.oauth2.credentials import Credentials
+            import json
+            if "gcp_oauth_credentials" in st.secrets:
+                creds_info = st.secrets["gcp_oauth_credentials"]
+                if isinstance(creds_info, str):
+                    creds_info = json.loads(creds_info)
+                # Forçar conversão de TOML dict para plain dict caso necessário
+                self.credentials = Credentials.from_authorized_user_info(dict(creds_info), SCOPES)
+        except Exception:
+            pass
+
+        if not self.credentials and os.path.exists(self.token_file):
             with open(self.token_file, 'rb') as token:
                 self.credentials = pickle.load(token)
         
