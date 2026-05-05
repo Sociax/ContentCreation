@@ -26,37 +26,57 @@ class AuthEngineGSC:
             import streamlit as st
             from google.oauth2.credentials import Credentials
             import json
-            if "gcp_oauth_credentials" in st.secrets:
-                creds_info = st.secrets["gcp_oauth_credentials"]
-                if isinstance(creds_info, str):
-                    creds_info = json.loads(creds_info)
-                # Forçar conversão de TOML dict para plain dict caso necessário
-                self.credentials = Credentials.from_authorized_user_info(dict(creds_info), SCOPES)
-        except Exception:
-            pass
+            
+            # Debug: avisar se o arquivo secrets.toml existe no ambiente da nuvem
+            if hasattr(st, "secrets"):
+                if "gcp_oauth_credentials" in st.secrets:
+                    creds_info = st.secrets["gcp_oauth_credentials"]
+                    if isinstance(creds_info, str):
+                        creds_info = json.loads(creds_info)
+                    # Forçar conversão de TOML dict para plain dict caso necessário
+                    self.credentials = Credentials.from_authorized_user_info(dict(creds_info), SCOPES)
+                else:
+                    st.warning("⚠️ Chave 'gcp_oauth_credentials' não foi encontrada dentro do st.secrets. Verifique se você salvou corretamente no painel do Streamlit Cloud.")
+        except Exception as e:
+            st.error(f"⚠️ Erro interno ao tentar ler os Secrets do Streamlit: {e}")
 
         if not self.credentials and os.path.exists(self.token_file):
             with open(self.token_file, 'rb') as token:
                 self.credentials = pickle.load(token)
         
-        # Validar se a credencial existe, é válida e possui os escopos corretos
-        if not self.credentials or not self.credentials.valid or not self.credentials.has_scopes(SCOPES):
-            if self.credentials and self.credentials.expired and self.credentials.refresh_token and self.credentials.has_scopes(SCOPES):
+        # Validar e renovar credenciais
+        if self.credentials:
+            # Se expirado mas tem refresh_token, renovar diretamente (funciona na nuvem sem client_secret.json)
+            if self.credentials.expired and self.credentials.refresh_token:
                 self.credentials.refresh(Request())
+            # Se credencial válida, prosseguir normalmente
+            if self.credentials.valid:
+                pass  # tudo certo
             else:
+                # Sem refresh_token disponível: precisa do fluxo completo (apenas local)
                 if not os.path.exists(self.client_secrets_file):
-                    # Final fallback: check current working directory
                     if os.path.exists('client_secret.json'):
                         self.client_secrets_file = os.path.abspath('client_secret.json')
                     else:
                         raise FileNotFoundError(f"Credenciais OAuth ({self.client_secrets_file}) não encontradas.")
-                
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.client_secrets_file, SCOPES)
+                flow = InstalledAppFlow.from_client_secrets_file(self.client_secrets_file, SCOPES)
                 self.credentials = flow.run_local_server(port=0)
-            
+        else:
+            # Nenhuma credencial disponível (nem pickle, nem secrets): fluxo completo local
+            if not os.path.exists(self.client_secrets_file):
+                if os.path.exists('client_secret.json'):
+                    self.client_secrets_file = os.path.abspath('client_secret.json')
+                else:
+                    raise FileNotFoundError(f"Credenciais OAuth ({self.client_secrets_file}) não encontradas.")
+            flow = InstalledAppFlow.from_client_secrets_file(self.client_secrets_file, SCOPES)
+            self.credentials = flow.run_local_server(port=0)
+
+        # Salvar token atualizado localmente (só funciona se tiver permissão de escrita)
+        try:
             with open(self.token_file, 'wb') as token:
                 pickle.dump(self.credentials, token)
+        except Exception:
+            pass  # Na nuvem, o filesystem pode ser read-only; não é crítico
 
         self.service = build('webmasters', 'v3', credentials=self.credentials)
         return self.service
