@@ -16,3 +16,6 @@ openpyxl
 selenium
 webdriver-manager
 pytrends
+mcp
+google-analytics-data
+google-analytics-admin

@@ -63,16 +63,16 @@ if gsc:
                 st.session_state.current_view = st.session_state[group_key]
 
         # --- Sidebar Navigation ---
-        gsc_opts = ["📊 GSC ANALYTICS"]
+        data_opts = ["📊 GSC ANALYTICS", "📈 GA4 ANALYTICS"]
         content_opts = ["✍️ CRIADOR DE CONTEÚDOS", "📝 OTIMIZADOR DE CONTEÚDO"]
         tech_opts = ["⚡ CWV", "⚔️ COMPARADOR DE URLS", "🔗 LINKS INTERNOS", "📊 SCHEMA", "📑 HEADERS", "🌐 HREFLANG", "🖼️ ALT IMAGE"]
 
         with st.sidebar:
             st.markdown("<div class='sociax-subheader-bar'>DATA & ANALYTICS</div>", unsafe_allow_html=True)
             st.radio(
-                "GSC", gsc_opts, 
-                index=gsc_opts.index(st.session_state.current_view) if st.session_state.current_view in gsc_opts else None, 
-                key="nav_gsc", on_change=set_view, args=("nav_gsc",), label_visibility="collapsed"
+                "Data", data_opts, 
+                index=data_opts.index(st.session_state.current_view) if st.session_state.current_view in data_opts else None, 
+                key="nav_data", on_change=set_view, args=("nav_data",), label_visibility="collapsed"
             )
             
             st.markdown("<div class='sociax-subheader-bar'>CONTENT CATEGORY</div>", unsafe_allow_html=True)
@@ -172,6 +172,108 @@ if gsc:
             else:
                 st.markdown("<div class='premium-card' style='text-align: center; background: rgba(255,255,255,0.02);'><h3 style='opacity: 0.5;'>SISTEMA PRONTO</h3><p style='opacity: 0.5;'>Por favor, configure os sinais do ativo na barra lateral para iniciar a análise.</p></div>", unsafe_allow_html=True)
         
+        elif view == "📈 GA4 ANALYTICS":
+            st.markdown("<h2 class='sociax-glow-text'>// GA4 ANALYTICS</h2>", unsafe_allow_html=True)
+            st.write("Conectado ao motor MCP para extração de relatórios e insights do Google Analytics 4.")
+            
+            # Form setup
+            col_ga1, col_ga2 = st.columns(2)
+            with col_ga1:
+                # Carregamento Dinâmico das Propriedades (Admin API)
+                if 'ga4_properties_dict' not in st.session_state:
+                    try:
+                        from google.analytics.admin import AnalyticsAdminServiceClient
+                        if not gsc.credentials:
+                            gsc.connect() # Garante que as credenciais OAuth sejam geradas/carregadas
+                        admin_client = AnalyticsAdminServiceClient(credentials=gsc.credentials)
+                        response = admin_client.list_account_summaries()
+                        prop_dict = {}
+                        for account in response:
+                            for prop in account.property_summaries:
+                                clean_id = prop.property.replace('properties/', '')
+                                prop_dict[f"{prop.display_name} ({clean_id})"] = clean_id
+                        st.session_state['ga4_properties_dict'] = prop_dict
+                    except Exception as e:
+                        st.session_state['ga4_properties_dict'] = {}
+                        st.error(f"Erro ao listar propriedades do GA4: {e}")
+
+                prop_dict = st.session_state.get('ga4_properties_dict', {})
+                if prop_dict:
+                    selected_prop_name = st.selectbox("Propriedade GA4", list(prop_dict.keys()), help="Lista automática de todas as propriedades da sua conta.")
+                    prop_id = prop_dict[selected_prop_name]
+                else:
+                    prop_id = st.text_input("Property ID Manual", value=os.getenv("GA4_PROPERTY_ID", ""))
+                
+                # NOVA INTERFACE AGENTE GA4
+                st.markdown("<p style='color: #888;'>O Agente GA4 tem acesso dinâmico a todas as métricas e dimensões da sua conta.</p>", unsafe_allow_html=True)
+                
+            st.divider()
+            
+            # Inicializa histórico de chat se não existir
+            if "ga4_chat_history" not in st.session_state:
+                st.session_state.ga4_chat_history = []
+                
+            # Renderiza histórico
+            for msg in st.session_state.ga4_chat_history:
+                if msg["role"] == "user":
+                    st.chat_message("user").write(msg["content"])
+                else:
+                    with st.chat_message("assistant"):
+                        if "dataframe" in msg:
+                            st.dataframe(msg["dataframe"], use_container_width=True)
+                        st.write(msg["content"])
+
+            user_ga4_prompt = st.chat_input("O que você deseja saber sobre o tráfego desta propriedade? (Ex: Receita e sessões por cidade nos últimos 15 dias)")
+            
+            if user_ga4_prompt:
+                st.session_state.ga4_chat_history.append({"role": "user", "content": user_ga4_prompt})
+                st.chat_message("user").write(user_ga4_prompt)
+                
+                with st.chat_message("assistant"):
+                    with st.spinner("🤖 O Agente está traduzindo a sua requisição..."):
+                        params = ai.extract_ga4_parameters(user_ga4_prompt)
+                        st.write(f"*(📡 Conectando ao MCP GA4 com os parâmetros: Métricas: {params.get('metrics')}, Dimensões: {params.get('dimensions')}, Período: {params.get('start_date')} até {params.get('end_date')})*")
+                        
+                        metrics = params.get("metrics", [])
+                        dimensions = params.get("dimensions", [])
+                        start_date = params.get("start_date", "30daysAgo")
+                        end_date = params.get("end_date", "today")
+                        
+                    with st.spinner("Extraindo dados oficiais..."):
+                        from mcp_ga_server import get_ga4_report
+                        res_json = get_ga4_report(
+                            metrics=metrics,
+                            dimensions=dimensions,
+                            start_date=start_date,
+                            end_date=end_date,
+                            property_id=prop_id
+                        )
+                        res = json.loads(res_json)
+                        
+                        if res.get("status") == "success":
+                            df_ga = pd.DataFrame(res.get("data", []))
+                            if not df_ga.empty:
+                                st.dataframe(df_ga, use_container_width=True)
+                                
+                                with st.spinner("Analisando os resultados..."):
+                                    ans_ga = ai.chat(f"O usuário perguntou: '{user_ga4_prompt}'. Aja como um Analista de Dados Sênior e explique os insights extraídos desta tabela do GA4.", df_ga)
+                                    st.write(ans_ga)
+                                    
+                                    # Salvar no histórico
+                                    st.session_state.ga4_chat_history.append({
+                                        "role": "assistant", 
+                                        "content": ans_ga,
+                                        "dataframe": df_ga
+                                    })
+                            else:
+                                msg_vazia = "A API retornou sucesso, mas não há dados (tabela vazia) para esta combinação de métricas, dimensões e datas ou a data é muito recente e o Google aplicou Thresholding."
+                                st.warning(msg_vazia)
+                                st.session_state.ga4_chat_history.append({"role": "assistant", "content": msg_vazia})
+                        else:
+                            error_msg = f"**Erro retornado pela API do GA4:** {res.get('message', 'Erro desconhecido. Verifique se a dimensão é compatível com a métrica pedida.')}"
+                            st.error(error_msg)
+                            st.session_state.ga4_chat_history.append({"role": "assistant", "content": error_msg})
+
         elif view == "📝 OTIMIZADOR DE CONTEÚDO":
             st.markdown("<h2 class='sociax-glow-text'>// OTIMIZADOR DE CONTEÚDO</h2>", unsafe_allow_html=True)
             col_opt1, col_opt2 = st.columns([1, 1])

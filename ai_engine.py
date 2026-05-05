@@ -79,6 +79,32 @@ class AIEngineGemini:
         prompt = f"Contexto GSC:\n{summary}\n\nPergunta do Usuário: {query}\n\nResponda em Português do Brasil (PT-BR) de forma profissional e direta."
         return self._safe_generate(prompt)
 
+    def extract_ga4_parameters(self, query: str) -> dict:
+        """Extrai as intenções do usuário e converte em parâmetros válidos para a API do GA4."""
+        prompt = f"""
+Você é um agente roteador do Google Analytics 4. O usuário pediu dados analíticos.
+Sua tarefa é extrair as métricas, dimensões e datas solicitadas pelo usuário.
+Use sempre a nomenclatura oficial da Data API do GA4 (ex: activeUsers, sessions, purchaseRevenue, pagePath, sessionDefaultChannelGroup, city, date).
+Se nenhuma data for especificada, retorne "30daysAgo" para start_date e "today" para end_date.
+
+Usuário: {query}
+
+Responda ESTRITAMENTE em JSON, sem markdown ou explicações. Exemplo de saída:
+{{
+    "metrics": ["sessions", "purchaseRevenue"],
+    "dimensions": ["city", "date"],
+    "start_date": "30daysAgo",
+    "end_date": "today"
+}}
+        """
+        res = self._safe_generate(prompt)
+        try:
+            clean = res.replace("```json", "").replace("```", "").strip()
+            return json.loads(clean)
+        except Exception as e:
+            # Fallback seguro
+            return {"metrics": ["activeUsers", "sessions"], "dimensions": ["date"], "start_date": "30daysAgo", "end_date": "today"}
+
     def analyze_content(self, url, keyword):
         """Analisa uma URL para dar nota ao conteúdo e sugerir otimizações baseadas em uma palavra-chave."""
         try:
@@ -492,6 +518,7 @@ class AIEngineGemini:
            - Lacunas de concorrentes batidas.
            - Densidade da Palavra-Chave (seo_check_score).
         9. Média de Palavra-Chave: A palavra-chave principal DEVE aparecer em média cerca de {keyword_average} vezes ao longo do texto.
+        10. Citação de Terceiros: Sempre que usar informações, dados ou estatísticas de fontes externas (3rd party), você DEVE embutir o link da fonte diretamente em uma das palavras-chave relevantes da própria frase (como hiperlink no texto). NÃO crie listas de referências no final nem use formatos explícitos como "Fonte: [link]".
 
         DIRETRIZ DE ESTILO DE ESCRITA ESPERADO:
         O tom do texto deve seguir exatamente este estilo: **{style}**

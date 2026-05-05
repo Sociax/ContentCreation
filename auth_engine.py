@@ -5,8 +5,11 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 import pandas as pd
 
-# SCOPES for Google Search Console API
-SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly']
+# SCOPES for Google Search Console and Google Analytics APIs
+SCOPES = [
+    'https://www.googleapis.com/auth/webmasters.readonly',
+    'https://www.googleapis.com/auth/analytics.readonly'
+]
 
 class AuthEngineGSC:
     def __init__(self, client_secrets_file='client_secret.json', token_file='sociax_token_v2.pickle'):
@@ -23,8 +26,9 @@ class AuthEngineGSC:
             with open(self.token_file, 'rb') as token:
                 self.credentials = pickle.load(token)
         
-        if not self.credentials or not self.credentials.valid:
-            if self.credentials and self.credentials.expired and self.credentials.refresh_token:
+        # Validar se a credencial existe, é válida e possui os escopos corretos
+        if not self.credentials or not self.credentials.valid or not self.credentials.has_scopes(SCOPES):
+            if self.credentials and self.credentials.expired and self.credentials.refresh_token and self.credentials.has_scopes(SCOPES):
                 self.credentials.refresh(Request())
             else:
                 if not os.path.exists(self.client_secrets_file):
