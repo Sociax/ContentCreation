@@ -9,6 +9,7 @@ import pandas as pd
 SCOPES = [
     'https://www.googleapis.com/auth/webmasters.readonly',
     'https://www.googleapis.com/auth/analytics.readonly',
+    'https://www.googleapis.com/auth/documents',
     'https://www.googleapis.com/auth/drive.file'
 ]
 
@@ -35,11 +36,18 @@ class AuthEngineGSC:
                     if isinstance(creds_info, str):
                         creds_info = json.loads(creds_info)
                     # Forçar conversão de TOML dict para plain dict caso necessário
-                    self.credentials = Credentials.from_authorized_user_info(dict(creds_info), SCOPES)
+                    temp_creds = Credentials.from_authorized_user_info(dict(creds_info))
+                    
+                    # Verificar se o token atual possui todos os scopes necessários
+                    has_all_scopes = all(s in (temp_creds.scopes or []) for s in SCOPES)
+                    if has_all_scopes:
+                        self.credentials = temp_creds
+                    else:
+                        st.info("🔄 Novos recursos detectados. É necessário re-autenticar para liberar o Google Docs.")
                 else:
                     st.warning("⚠️ Chave 'gcp_oauth_credentials' não foi encontrada dentro do st.secrets. Verifique se você salvou corretamente no painel do Streamlit Cloud.")
         except Exception as e:
-            st.error(f"⚠️ Erro interno ao tentar ler os Secrets do Streamlit: {e}")
+            pass # Silencioso para permitir fallback local
 
         if not self.credentials and os.path.exists(self.token_file):
             with open(self.token_file, 'rb') as token:
