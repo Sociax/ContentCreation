@@ -21,7 +21,19 @@ load_dotenv()
 
 class AIEngineGemini:
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        # Tenta pegar de st.secrets primeiro (Streamlit Cloud), depois os.getenv (.env local)
+        self.api_key = api_key
+        if not self.api_key:
+            try:
+                import streamlit as st
+                if "GOOGLE_API_KEY" in st.secrets:
+                    self.api_key = st.secrets["GOOGLE_API_KEY"]
+            except:
+                pass
+        
+        if not self.api_key:
+            self.api_key = os.getenv("GOOGLE_API_KEY")
+
         if not self.api_key:
             raise ValueError("GOOGLE_API_KEY não configurada no ambiente.")
         
