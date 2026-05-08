@@ -9,7 +9,7 @@ import pandas as pd
 SCOPES = [
     'https://www.googleapis.com/auth/webmasters.readonly',
     'https://www.googleapis.com/auth/analytics.readonly',
-    'https://www.googleapis.com/auth/documents'
+    'https://www.googleapis.com/auth/drive.file'
 ]
 
 class AuthEngineGSC:
