@@ -520,6 +520,27 @@ if gsc:
                 st.markdown("<div class='premium-card' style='margin-top: 2rem;'>", unsafe_allow_html=True)
                 st.markdown(st.session_state['cg_report'])
                 st.markdown("</div>", unsafe_allow_html=True)
+                
+                col_exp1, col_exp2, col_exp3 = st.columns([1, 2, 1])
+                with col_exp2:
+                    if st.button("📄 EXPORTAR PARA GOOGLE DOCS", use_container_width=True):
+                        with st.spinner("Criando documento no Google Docs..."):
+                            try:
+                                from datetime import datetime
+                                content = st.session_state['cg_report']
+                                
+                                # New naming convention: YYYY-MM-DD - Site - Keyword
+                                current_date = datetime.now().strftime("%Y-%m-%d")
+                                site_name = selected_client_key
+                                doc_title = f"{current_date} - {site_name} - {target_kw}"
+                                
+                                doc_url = gsc.create_google_doc(doc_title, content)
+                                st.success(f"✅ Documento criado com sucesso!")
+                                st.link_button("🔗 ABRIR GOOGLE DOC", doc_url, use_container_width=True)
+                            except Exception as e:
+                                st.error(f"Erro ao exportar: {e}")
+                                if "insufficient permissions" in str(e).lower() or "scope" in str(e).lower():
+                                    st.info("💡 Parece que você precisa autorizar a nova permissão de escrita de documentos. Clique no ícone 🔄 na barra lateral para resetar a sessão e fazer o login novamente.")
 
     except Exception as e:
         st.error(f"Erro na renderização: {e}")

@@ -8,7 +8,8 @@ import pandas as pd
 # SCOPES for Google Search Console and Google Analytics APIs
 SCOPES = [
     'https://www.googleapis.com/auth/webmasters.readonly',
-    'https://www.googleapis.com/auth/analytics.readonly'
+    'https://www.googleapis.com/auth/analytics.readonly',
+    'https://www.googleapis.com/auth/documents'
 ]
 
 class AuthEngineGSC:
@@ -110,3 +111,29 @@ class AuthEngineGSC:
             })
             data.append(entry)
         return pd.DataFrame(data)
+
+    def create_google_doc(self, title, content):
+        """Creates a new Google Doc and populates it with content."""
+        if not self.credentials:
+            self.connect()
+        
+        try:
+            docs_service = build('docs', 'v1', credentials=self.credentials)
+            doc = docs_service.documents().create(body={'title': title}).execute()
+            doc_id = doc.get('documentId')
+            
+            # Simple insertion of the content
+            requests = [
+                {
+                    'insertText': {
+                        'location': {
+                            'index': 1,
+                        },
+                        'text': content
+                    }
+                }
+            ]
+            docs_service.documents().batchUpdate(documentId=doc_id, body={'requests': requests}).execute()
+            return f"https://docs.google.com/document/d/{doc_id}/edit"
+        except Exception as e:
+            raise Exception(f"Erro ao criar documento no Google Docs: {str(e)}")
