@@ -93,7 +93,7 @@ if gsc:
 
         # --- Sidebar Controls ---
         with st.sidebar:
-            if view in ["📊 GSC ANALYTICS", "📝 OTIMIZADOR DE CONTEÚDO", "⚡ CWV"]:
+            if view in ["📊 GSC ANALYTICS", "📝 OTIMIZADOR DE CONTEÚDO", "⚡ CWV", "✍️ CRIADOR DE CONTEÚDOS"]:
                 st.markdown("<div class='sociax-subheader-bar'>SINAIS DE DADOS</div>", unsafe_allow_html=True)
                 
                 if 'sites_list' not in st.session_state:
@@ -508,10 +508,28 @@ if gsc:
                 
                 if st.button("🚀 GERAR CONTEÚDO OTIMIZADO", use_container_width=True):
                     if target_kw:
-                        with st.spinner("🔍 Coletando tendências em tempo real do Google Trends e gerando conteúdo..."):
+                        with st.spinner("🔍 Coletando tendências e mapeando links internos..."):
                             client_data = clients_db[selected_client_key]
-                            # Chama a nova função de AI
-                            generated_content = ai.generate_blog_content(client_data, target_kw, content_style, keyword_average, additional_notes, content_intent, kw_type, content_format)
+                            
+                            # Tentar coletar links internos reais do GSC se os dados estiverem carregados
+                            internal_links = None
+                            if 'v2_data' in st.session_state and st.session_state.get('last_site'):
+                                try:
+                                    # Busca especificamente as páginas (URLs) para linkagem interna
+                                    df_pages = gsc.fetch_analytics(st.session_state['last_site'], 
+                                                                  (date.today() - timedelta(days=90)).strftime("%Y-%m-%d"), 
+                                                                  date.today().strftime("%Y-%m-%d"), 
+                                                                  dims=['page'], limit=15)
+                                    if not df_pages.empty:
+                                        internal_links = df_pages['page'].tolist()
+                                except: pass
+
+                            # Chama a nova função de AI com suporte a links internos
+                            generated_content = ai.generate_blog_content(
+                                client_data, target_kw, content_style, keyword_average, 
+                                additional_notes, content_intent, kw_type, content_format,
+                                internal_links=internal_links
+                            )
                             st.session_state['cg_report'] = generated_content
                     else:
                         st.warning("Preencha a Palavra-Chave Principal para continuar.")

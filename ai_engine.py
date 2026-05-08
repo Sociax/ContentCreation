@@ -475,12 +475,16 @@ Responda ESTRITAMENTE em JSON, sem markdown ou explicações. Exemplo de saída:
             print(f"⚠️ Google Trends indisponível para '{keyword}': {e}")
             return None
 
-    def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes="", intent="Informativo", kw_type="Short tail", content_format="Blog post content"):
+    def generate_blog_content(self, client_data, keyword, style, keyword_average, additional_notes="", intent="Informativo", kw_type="Short tail", content_format="Blog post content", internal_links=None):
         """
-        Gera um conteúdo otimizado para SEO com dados reais do Google Trends.
+        Gera um conteúdo otimizado para SEO com dados reais do Google Trends e suporte a linkagem interna inteligente.
         """
         notes_section = f"\n        OBSERVAÇÕES ADICIONAIS DO USUÁRIO:\n        - {additional_notes}\n" if additional_notes.strip() else ""
         
+        links_section = ""
+        if internal_links:
+            links_section = f"\n        CONTEXTO DE LINKAGEM INTERNA (Páginas Reais do Cliente):\n        {', '.join(internal_links)}\n        INSTRUÇÃO: Use estas URLs específicas para criar links internos contextuais ao longo do texto. NÃO aponte apenas para a home.\n"
+
         # Fetch live Google Trends data
         trends_data = self._fetch_google_trends(keyword)
         if trends_data:
@@ -505,6 +509,7 @@ Responda ESTRITAMENTE em JSON, sem markdown ou explicações. Exemplo de saída:
         - Tipo de Palavra-Chave: {kw_type}
         - Formato Exigido: {content_format}
         {trends_section}
+        {links_section}
         {notes_section}
         DIRETRIZES TÉCNICAS E REGRAS INEGOCIÁVEIS:
         1. Visão de Busca: Dedique a primeira seção para explicar a intenção de busca e como os dados do Google Trends acima confirmam essa tendência.
@@ -519,6 +524,7 @@ Responda ESTRITAMENTE em JSON, sem markdown ou explicações. Exemplo de saída:
            - Densidade da Palavra-Chave (seo_check_score).
         9. Média de Palavra-Chave: A palavra-chave principal DEVE aparecer em média cerca de {keyword_average} vezes ao longo do texto.
         10. Citação de Terceiros: Sempre que usar informações, dados ou estatísticas de fontes externas (3rd party), você DEVE embutir o link da fonte diretamente em uma das palavras-chave relevantes da própria frase (como hiperlink no texto). É OBRIGATÓRIO usar a URL final e completa (longtail) da página específica da informação, e NÃO apenas o domínio principal (ex: use 'https://exemplo.com/estudo-seo-2025' em vez de 'https://exemplo.com'). NÃO crie listas de referências no final nem use formatos explícitos como "Fonte: [link]".
+        11. Linkagem Interna: A mesma regra da URL completa (longtail) vale para links internos. Se for linkar um curso, serviço ou página específica dentro do domínio do cliente ({client_data['url']}), você DEVE achar o link exato e relevante. NÃO aponte links internos para a Home se houver uma página interna mais específica.
 
         DIRETRIZ DE ESTILO DE ESCRITA ESPERADO:
         O tom do texto deve seguir exatamente este estilo: **{style}**
