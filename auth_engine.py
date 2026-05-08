@@ -61,24 +61,46 @@ class AuthEngineGSC:
             # Se credencial válida, prosseguir normalmente
             if self.credentials.valid:
                 pass  # tudo certo
+                # Na nuvem, não podemos rodar o local server. Avisar o usuário.
+                is_cloud = hasattr(st, "secrets") and os.getenv("STREAMLIT_RUNTIME_ENV") != "local"
+                
+                if is_cloud:
+                    st.error("🔒 **Autenticação Necessária**: Não foi possível encontrar credenciais válidas nos Secrets do Streamlit.")
+                    st.info("Para usar o Google Docs na nuvem, você deve gerar o token localmente e colar o JSON nos Secrets. [Veja como fazer](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management)")
+                    st.stop()
+                else:
+                    if not os.path.exists(self.client_secrets_file):
+                        if os.path.exists('client_secret.json'):
+                            self.client_secrets_file = os.path.abspath('client_secret.json')
+                        else:
+                            st.error(f"❌ Arquivo `{self.client_secrets_file}` não encontrado.")
+                            st.info("Para rodar localmente, você precisa do arquivo `client_secret.json` na raiz do projeto.")
+                            st.stop()
+                    
+                    flow = InstalledAppFlow.from_client_secrets_file(self.client_secrets_file, SCOPES)
+                    self.credentials = flow.run_local_server(port=0)
+        else:
+            # Nenhuma credencial disponível (nem pickle, nem secrets)
+            is_cloud = hasattr(st, "secrets") and os.getenv("STREAMLIT_RUNTIME_ENV") != "local"
+            
+            if is_cloud:
+                st.error("🔒 **Sessão não iniciada**: O token de acesso do Google não foi encontrado.")
+                st.markdown("""
+                ### Como configurar na Nuvem:
+                1. Rode o app localmente e faça login.
+                2. Use o comando `token_to_json` (ou peça para o Antigravity) para gerar o JSON.
+                3. Cole o resultado no painel de **Secrets** do Streamlit Cloud.
+                """)
+                st.stop()
             else:
-                # Sem refresh_token disponível: precisa do fluxo completo (apenas local)
                 if not os.path.exists(self.client_secrets_file):
                     if os.path.exists('client_secret.json'):
                         self.client_secrets_file = os.path.abspath('client_secret.json')
                     else:
-                        raise FileNotFoundError(f"Credenciais OAuth ({self.client_secrets_file}) não encontradas.")
+                        st.error(f"❌ Arquivo `{self.client_secrets_file}` não encontrado.")
+                        st.stop()
                 flow = InstalledAppFlow.from_client_secrets_file(self.client_secrets_file, SCOPES)
                 self.credentials = flow.run_local_server(port=0)
-        else:
-            # Nenhuma credencial disponível (nem pickle, nem secrets): fluxo completo local
-            if not os.path.exists(self.client_secrets_file):
-                if os.path.exists('client_secret.json'):
-                    self.client_secrets_file = os.path.abspath('client_secret.json')
-                else:
-                    raise FileNotFoundError(f"Credenciais OAuth ({self.client_secrets_file}) não encontradas.")
-            flow = InstalledAppFlow.from_client_secrets_file(self.client_secrets_file, SCOPES)
-            self.credentials = flow.run_local_server(port=0)
 
         # Salvar token atualizado localmente (só funciona se tiver permissão de escrita)
         try:
