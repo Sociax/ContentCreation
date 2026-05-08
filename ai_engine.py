@@ -518,7 +518,7 @@ Responda ESTRITAMENTE em JSON, sem markdown ou explicações. Exemplo de saída:
            - Lacunas de concorrentes batidas.
            - Densidade da Palavra-Chave (seo_check_score).
         9. Média de Palavra-Chave: A palavra-chave principal DEVE aparecer em média cerca de {keyword_average} vezes ao longo do texto.
-        10. Citação de Terceiros: Sempre que usar informações, dados ou estatísticas de fontes externas (3rd party), você DEVE embutir o link da fonte diretamente em uma das palavras-chave relevantes da própria frase (como hiperlink no texto). NÃO crie listas de referências no final nem use formatos explícitos como "Fonte: [link]".
+        10. Citação de Terceiros: Sempre que usar informações, dados ou estatísticas de fontes externas (3rd party), você DEVE embutir o link da fonte diretamente em uma das palavras-chave relevantes da própria frase (como hiperlink no texto). É OBRIGATÓRIO usar a URL final e completa (longtail) da página específica da informação, e NÃO apenas o domínio principal (ex: use 'https://exemplo.com/estudo-seo-2025' em vez de 'https://exemplo.com'). NÃO crie listas de referências no final nem use formatos explícitos como "Fonte: [link]".
 
         DIRETRIZ DE ESTILO DE ESCRITA ESPERADO:
         O tom do texto deve seguir exatamente este estilo: **{style}**
